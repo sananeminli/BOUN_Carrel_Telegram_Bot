@@ -22,18 +22,23 @@ disp   =  updater.dispatcher
 
 def get_carrel_data():
     req = requests.get(url=url,headers=headers)
+    
     soup  =  BeautifulSoup(req.content,"lxml")
-    a = soup.findAll('tr' , attrs={'class':'bibItemsEntry'})
-    for i in range (0,len(a)):
-        carrel_no = soup.findAll('tr' , attrs={'class':'bibItemsEntry'})[i].find_all('td')[1].get_text()
-        durum = soup.findAll('tr' , attrs={'class':'bibItemsEntry'})[i].find_all('td')[2].get_text()
-        a = carrel_no.replace(u'\xa0', u'')
-        b = durum.replace(u'\xa0', u'')
-        if a.replace('Carrel ', '') in carrels_without_window:
-            a = "\U0001f7e8 "+a
+    
+    total_number_of_carrels = len(soup.findAll('tr' , attrs={'class':'bibItemsEntry'}))
+    
+    for i in range (0,total_number_of_carrels):
+        raw_carrel_no = soup.findAll('tr' , attrs={'class':'bibItemsEntry'})[i].find_all('td')[1].get_text()
+        raw_state = soup.findAll('tr' , attrs={'class':'bibItemsEntry'})[i].find_all('td')[2].get_text()
+        carrel_no = raw_carrel_no.replace(u'\xa0', u'')
+        carrel_state = raw_state.replace(u'\xa0', u'')
+        print(carrel_no)
+        print(carrel_state)
+        if carrel_no.replace('Carrel ', '') in carrels_without_window:
+            carrel_no = "\U0001f7e8 "+carrel_no
         else:
-            a = "\U0001f7e6 "+ a     
-        all_carrels.append(str(a)+ ' ------>'+ str(b))
+            carrel_no = "\U0001f7e6 "+ carrel_no     
+        all_carrels.append(str(carrel_no)+ ' ------>'+ str(carrel_state))
 
         
 
