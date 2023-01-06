@@ -5,8 +5,8 @@ import telegram.ext as t
 from bs4 import BeautifulSoup
 
 url = 'https://seyhan.library.boun.edu.tr/search~S5?/.b1555861/.b1555861/1,1,1,B/holdings~1555861&FF=&1,0,'
-
-headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'} # This is chrome, you can set whatever browser you like
+#Chrome user agent
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'}
 
 telegram_api_token  = ''
 
@@ -22,18 +22,15 @@ disp   =  updater.dispatcher
 
 def get_carrel_data():
     req = requests.get(url=url,headers=headers)
-    
     soup  =  BeautifulSoup(req.content,"lxml")
-    
     total_number_of_carrels = len(soup.findAll('tr' , attrs={'class':'bibItemsEntry'}))
     
     for i in range (0,total_number_of_carrels):
-        raw_carrel_no = soup.findAll('tr' , attrs={'class':'bibItemsEntry'})[i].find_all('td')[1].get_text()
-        raw_state = soup.findAll('tr' , attrs={'class':'bibItemsEntry'})[i].find_all('td')[2].get_text()
-        carrel_no = raw_carrel_no.replace(u'\xa0', u'')
-        carrel_state = raw_state.replace(u'\xa0', u'')
-        print(carrel_no)
-        print(carrel_state)
+        carrel_no = soup.findAll('tr' , attrs={'class':'bibItemsEntry'})[i].find_all('td')[1].get_text()
+        carrel_state = soup.findAll('tr' , attrs={'class':'bibItemsEntry'})[i].find_all('td')[2].get_text()
+        carrel_no = carrel_no.replace(u'\xa0', u'')
+        carrel_state = carrel_state.replace(u'\xa0', u'')
+        #adding colors
         if carrel_no.replace('Carrel ', '') in carrels_without_window:
             carrel_no = "\U0001f7e8 "+carrel_no
         else:
