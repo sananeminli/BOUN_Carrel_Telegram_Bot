@@ -1,2 +1,2 @@
-# BOUN_Carrel_Telegram_Bot
+# Telegram bot for getting live carrel data 
 This telegram bot is a personal project of mine. This bot's main functionality is getting all carrel data from the library's website and returning the data according to some features. For scraping data from the website, I have used the BeautifulSoup library. This bot is currently live on the AWS EC2 virtual machine, so users can interact with that bot by using the following telegram chat link http://t.me/CarrelBoun_bot. Users can see available commands in the telegram command menu, or users can type /help in the bot and check all possible commands.
