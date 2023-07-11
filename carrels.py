@@ -10,7 +10,7 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36',  # noqa: E501
 }
 
-telegram_api_token = ''
+telegram_api_token = ''  # TODO: can be fetched from configs
 
 carrels_without_window = [
     '422 ',
@@ -30,9 +30,9 @@ carrels_without_window = [
     '327 ',
     '326 ',
     '325 ',
-]
+]  # TODO: can be fetched from configs
 
-all_carrels = []
+all_carrels: list[str] = []
 
 bot = Bot(telegram_api_token)
 
@@ -44,11 +44,12 @@ disp = updater.dispatcher
 def get_carrel_data():
     req = requests.get(url=url, headers=headers)
     soup = BeautifulSoup(req.content, "lxml")
-    total_number_of_carrels = len(soup.findAll('tr', attrs={'class': 'bibItemsEntry'}))
+    all_carrels = soup.findAll('tr', attrs={'class': 'bibItemsEntry'})
+    total_number_of_carrels = len(all_carrels)
 
     for i in range(0, total_number_of_carrels):
-        carrel_no = soup.findAll('tr', attrs={'class': 'bibItemsEntry'})[i].find_all('td')[1].get_text()
-        carrel_state = soup.findAll('tr', attrs={'class': 'bibItemsEntry'})[i].find_all('td')[2].get_text()
+        carrel_no = all_carrels[i].find_all('td')[1].get_text()
+        carrel_state = all_carrels[i].find_all('td')[2].get_text()
         carrel_no = carrel_no.replace('\xa0', '')
         carrel_state = carrel_state.replace('\xa0', '')
         # adding colors
