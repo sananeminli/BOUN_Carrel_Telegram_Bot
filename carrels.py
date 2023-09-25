@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import requests
 import telegram.ext as t
 from bs4 import BeautifulSoup
@@ -31,6 +33,10 @@ carrels_without_window = [
     '326 ',
     '325 ',
 ]  # TODO: can be fetched from configs
+color_carrels_without_window = "\U0001f7e8"
+carrels_without_window_dict = {  # k for key, v for value.
+    k: v for (k, v) in zip(carrels_without_window, [color_carrels_without_window] * len(carrels_without_window))
+}
 
 all_carrels: list[str] = []
 
@@ -53,53 +59,57 @@ def get_carrel_data():
         carrel_no = carrel_no.replace('\xa0', '')
         carrel_state = carrel_state.replace('\xa0', '')
         # adding colors
-        if carrel_no.replace('Carrel ', '') in carrels_without_window:
-            carrel_no = "\U0001f7e8 " + carrel_no
-        else:
-            carrel_no = "\U0001f7e6 " + carrel_no
-        all_carrels.append(str(carrel_no) + ' ---> ' + str(carrel_state))
+        carrel_color = carrels_without_window_dict.get(carrel_no.replace('Carrel ', ''), "\U0001f7e6")
+        # appending carrel info
+        all_carrels.append(f"{carrel_color} {carrel_no} ---> {carrel_state}")
 
 
-def get_all_data():
+def get_all_data() -> str:
     get_carrel_data()
-    result = ''
+    result: list[str] = []
     for i in range(0, len(all_carrels)):
         if 'for vis' in all_carrels[i]:
             continue
-        result += '\n' + all_carrels[i]
+        result.append(all_carrels[i])
 
+    all_data: str = "\n".join(result)
     all_carrels.clear()
-    return result
+    return all_data
 
 
-def get_empty_carrels():
+def get_empty_carrels() -> str:
     get_carrel_data()
-    result = ''
+    result: list[str] = []
     for i in range(0, len(all_carrels)):
         if 'for vis' in all_carrels[i] or 'DUE' in all_carrels[i]:
             continue
-        result += '\n' + all_carrels[i]
-    if result == '':
-        all_carrels.clear()
-        return ' Hepsi Dolu!'
+        result.append(all_carrels[i])
 
-    else:
+    if not result:
         all_carrels.clear()
-        return result
+        return 'Hepsi Dolu!'
+    else:
+        empty_data: str = "\n".join(result)
+        all_carrels.clear()
+        return empty_data
 
 
 def show_carrel_location(update, context):
     chat_id = update.message.chat_id
-    bot.send_photo(chat_id=chat_id, photo=open(r"kat1.jpg", "rb"))  # TODO: where is kat1.jpg?
-    bot.send_photo(chat_id=chat_id, photo=open(r"kat2.jpg", "rb"))  # TODO: where is kat2.jpg?
+    kat1 = Path("kat1.jpg")
+    kat2 = Path("kat2.jpg")
+    bot.send_photo(chat_id=chat_id, photo=kat1)
+    bot.send_photo(chat_id=chat_id, photo=kat2)
 
 
 def show_all_carrels(update, context):
-    update.message.reply_text(get_all_data())
+    all_data = get_all_data()
+    update.message.reply_text(all_data)
 
 
 def show_empty(update, context):
-    update.message.reply_text(get_empty_carrels())
+    empty_carrels = get_empty_carrels()
+    update.message.reply_text(empty_carrels)
 
 
 def help(update, context):
